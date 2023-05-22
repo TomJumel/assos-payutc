@@ -3,15 +3,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:url_launcher/url_launcher_string.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-
 import 'package:payutc/generated/l10n.dart';
 import 'package:payutc/src/env.dart';
 import 'package:payutc/src/services/app.dart';
 import 'package:payutc/src/ui/screen/select_amount.dart';
 import 'package:payutc/src/ui/style/color.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class PaymentFlowPage extends StatefulWidget {
   final double amount;
@@ -54,6 +52,8 @@ class PaymentFlowPage extends StatefulWidget {
 class _PaymentFlowPageState extends State<PaymentFlowPage> {
   String? _url, _error;
 
+  final WebViewController controller = WebViewController();
+
   @override
   void initState() {
     AppService.instance.nemoPayApi
@@ -63,6 +63,18 @@ class _PaymentFlowPageState extends State<PaymentFlowPage> {
               if (mounted) {
                 setState(() {});
               }
+              controller.loadRequest(Uri.parse(_url!));
+              controller.setJavaScriptMode(JavaScriptMode.unrestricted);
+              controller.setNavigationDelegate(
+                  NavigationDelegate(onPageStarted: (request) {
+                Uri url = Uri.parse(request);
+                Uri callback = Uri.parse(payUrlCallback);
+                if (url.host == callback.host) {
+                  if (url.path == callback.path) {
+                    Navigator.pop(context, true);
+                  }
+                }
+              }));
             }))
         .catchError((e) {
       _error = "Une erreur est survenue";
@@ -155,18 +167,8 @@ class _PaymentFlowPageState extends State<PaymentFlowPage> {
                   borderRadius:
                       const BorderRadius.vertical(top: Radius.circular(15)),
                   child: SizedBox.expand(
-                      child: WebView(
-                    javascriptMode: JavascriptMode.unrestricted,
-                    initialUrl: snapshot.data!,
-                    onPageStarted: (navigation) {
-                      Uri url = Uri.parse(navigation);
-                      Uri callback = Uri.parse(payUrlCallback);
-                      if (url.host == callback.host) {
-                        if (url.path == callback.path) {
-                          Navigator.pop(context, true);
-                        }
-                      }
-                    },
+                      child: WebViewWidget(
+                    controller: controller,
                   )),
                 );
               }

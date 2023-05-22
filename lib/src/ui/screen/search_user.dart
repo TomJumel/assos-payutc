@@ -1,15 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:permission_handler/permission_handler.dart';
-
 import 'package:payutc/generated/l10n.dart';
 import 'package:payutc/src/models/user.dart';
 import 'package:payutc/src/services/app.dart';
 import 'package:payutc/src/services/search_user_manager.dart';
 import 'package:payutc/src/services/unilinks.dart';
 import 'package:payutc/src/ui/style/color.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 typedef SelectUserCallBack = void Function(BuildContext context, User user);
 
@@ -467,14 +465,12 @@ class _ScanPageState extends State<ScanPage> {
   Widget _mobileScannerContent() => Stack(
         children: [
           MobileScanner(
-            allowDuplicates: false,
             controller:
                 MobileScannerController(formats: [BarcodeFormat.qrCode]),
-            onDetect: (barcode, args) {
-              if (barcode.rawValue == null) {
-              } else {
-                final String code = barcode.rawValue!;
-                Navigator.pop(context, code);
+            onDetect: (BarcodeCapture barcode) {
+              if (barcode.raw != null && barcode.barcodes.isNotEmpty) {
+                final data = barcode.barcodes.first;
+                Navigator.pop(context, data);
               }
             },
           ),

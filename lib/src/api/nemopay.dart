@@ -23,7 +23,7 @@ class NemoPayApi {
     }));
     jar = CookieJar();
     client.interceptors.add(CookieManager(jar));
-    client.addSentry(captureFailedRequests: true);
+    client.addSentry();
     if (dioFineLogs) {
       client.interceptors.add(LogInterceptor(responseBody: true));
     }
@@ -47,8 +47,7 @@ class NemoPayApi {
   // services/MYACCOUNT/getUserDetails
   Future<Map> getUserDetails() async {
     try {
-      final resp = await client.get(
-          "services/MYACCOUNT/getUserDetails",
+      final resp = await client.get("services/MYACCOUNT/getUserDetails",
           options: Options(contentType: Headers.jsonContentType));
       logger.i(resp.data);
       return resp.data;

@@ -1,8 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
-import 'package:sentry_dio/sentry_dio.dart';
-
 import 'package:payutc/src/env.dart' as env;
+import 'package:sentry_dio/sentry_dio.dart';
 
 class CasApi {
   late Dio client;
@@ -11,10 +10,14 @@ class CasApi {
     client = Dio(BaseOptions(baseUrl: env.casUrl));
     client.interceptors.add(
       RetryInterceptor(
-          dio: client,
-          retryEvaluator: (error, at) => error.type != DioErrorType.response),
+        dio: client,
+        retryEvaluator: (error, at) =>
+            error.response != null &&
+            error.response!.statusCode == 401 &&
+            at < 3,
+      ),
     );
-    client.addSentry(captureFailedRequests: true);
+    client.addSentry();
   }
 
   Future<String> reConnectUser(String? ticket) async {
@@ -45,7 +48,7 @@ class CasApi {
       );
       return _extractToken(response.headers.value("location"));
     } on DioError catch (e) {
-      if (e.type == DioErrorType.response) {
+      if (e.response != null) {
         if (e.response!.statusCode == 401) {
           throw "cas/bad-credentials";
         }

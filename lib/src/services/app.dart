@@ -145,7 +145,7 @@ class AppService extends ChangeNotifier {
     try {
       ticket = await _casApi.reConnectUser(storageService.ticket);
     } on DioError catch (e) {
-      if (e.type == DioErrorType.response) {
+      if (e.response != null) {
         if (e.response!.statusCode == 404) {
           UserData? d = await storageService.userData;
           if (d == null) rethrow;
@@ -168,12 +168,12 @@ class AppService extends ChangeNotifier {
     }
   }
 
-  void _updateWidget() async{
+  void _updateWidget() async {
     try {
       await HomeWidget.saveWidgetData<int>(
           'payutc_amount_value', walletService.data?.credit.toInt() ?? 0);
-      await HomeWidget.saveWidgetData<String>(
-          'payutc_reload_time', "A jour le ${DateTime.now().day.toString().padLeft(2,"0")}/${DateTime.now().month.toString().padLeft(2,"0")} à ${DateTime.now().hour.toString().padLeft(2,"0")}:${DateTime.now().minute.toString().padLeft(2,"0")}");
+      await HomeWidget.saveWidgetData<String>('payutc_reload_time',
+          "A jour le ${DateTime.now().day.toString().padLeft(2, "0")}/${DateTime.now().month.toString().padLeft(2, "0")} à ${DateTime.now().hour.toString().padLeft(2, "0")}:${DateTime.now().minute.toString().padLeft(2, "0")}");
       await HomeWidget.updateWidget(
           name: 'AmountWidget', iOSName: 'AppWidgetProvider');
     } catch (_) {}
