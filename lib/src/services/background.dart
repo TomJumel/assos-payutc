@@ -1,7 +1,8 @@
 import 'dart:io';
 
-import 'package:payutc/src/services/app.dart';
 import 'package:workmanager/workmanager.dart';
+
+import 'package:payutc/src/services/app.dart';
 
 @pragma('vm:entry-point')
 void callbackDispatcher() {
