@@ -9,25 +9,31 @@ import 'package:payutc/src/models/user.dart';
 import 'package:payutc/src/ui/screen/transfert_select_amount.dart';
 import 'package:payutc/src/ui/style/color.dart';
 
+class PushUrlNavigationDelegate extends NavigationDelegate {
+  PushUrlNavigationDelegate()
+      : super(onNavigationRequest: (navigationState) async {
+          launchUrlString(navigationState.url,
+              mode: LaunchMode.externalApplication);
+          return NavigationDecision.prevent;
+        });
+}
+
 void showWebView(BuildContext context, String fileUrl, String name) {
   Navigator.push(
     context,
     CupertinoPageRoute(
-      builder: (ctx) => Scaffold(
-        appBar: AppBar(
-          title: Text(name),
-        ),
-        body: WebView(
-          onWebViewCreated: (controller) {
-            controller.loadFlutterAsset(fileUrl);
-          },
-          navigationDelegate: (navigationState) async {
-            launchUrlString(navigationState.url,
-                mode: LaunchMode.externalApplication);
-            return NavigationDecision.prevent;
-          },
-        ),
-      ),
+      builder: (ctx) {
+        WebViewController controller = WebViewController();
+        controller.setNavigationDelegate(PushUrlNavigationDelegate());
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(name),
+          ),
+          body: WebViewWidget(
+            controller: WebViewController(),
+          ),
+        );
+      },
     ),
   );
 }

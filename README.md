@@ -83,7 +83,7 @@ Before pushing your code, please run flutter analysis commands.
 ```shell
 flutter analyze
 flutter pub run import_sorter:main
-flutter format .
+dart format .
 ```
 # Authors
 

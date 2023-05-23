@@ -467,14 +467,12 @@ class _ScanPageState extends State<ScanPage> {
   Widget _mobileScannerContent() => Stack(
         children: [
           MobileScanner(
-            allowDuplicates: false,
             controller:
                 MobileScannerController(formats: [BarcodeFormat.qrCode]),
-            onDetect: (barcode, args) {
-              if (barcode.rawValue == null) {
-              } else {
-                final String code = barcode.rawValue!;
-                Navigator.pop(context, code);
+            onDetect: (BarcodeCapture barcode) {
+              if (barcode.raw != null && barcode.barcodes.isNotEmpty) {
+                final data = barcode.barcodes.first;
+                Navigator.pop(context, data);
               }
             },
           ),

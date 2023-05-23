@@ -58,10 +58,13 @@ class _ReceivePageState extends State<ReceivePage> {
                     borderRadius: BorderRadius.circular(15),
                     border: Border.all(color: Colors.white)),
                 padding: const EdgeInsets.all(15),
-                child: QrImage(
+                child: QrImageView(
                   data: AppService.instance.generateShareLink(),
                   embeddedImage: const AssetImage("assets/img/logo.jpg"),
-                  foregroundColor: Colors.white,
+                  dataModuleStyle: const QrDataModuleStyle(
+                    dataModuleShape: QrDataModuleShape.circle,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               Padding(

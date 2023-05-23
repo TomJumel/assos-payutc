@@ -11,10 +11,14 @@ class CasApi {
     client = Dio(BaseOptions(baseUrl: env.casUrl));
     client.interceptors.add(
       RetryInterceptor(
-          dio: client,
-          retryEvaluator: (error, at) => error.type != DioErrorType.response),
+        dio: client,
+        retryEvaluator: (error, at) =>
+            error.response != null &&
+            error.response!.statusCode == 401 &&
+            at < 3,
+      ),
     );
-    client.addSentry(captureFailedRequests: true);
+    client.addSentry();
   }
 
   Future<String> reConnectUser(String? ticket) async {
@@ -45,7 +49,7 @@ class CasApi {
       );
       return _extractToken(response.headers.value("location"));
     } on DioError catch (e) {
-      if (e.type == DioErrorType.response) {
+      if (e.response != null) {
         if (e.response!.statusCode == 401) {
           throw "cas/bad-credentials";
         }
