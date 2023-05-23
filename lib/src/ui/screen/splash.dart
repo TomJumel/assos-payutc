@@ -50,7 +50,8 @@ class _SplashPageState extends State<SplashPage> {
           children: [
             SvgPicture.asset(
               "assets/img/payutc.svg",
-              theme: const SvgTheme(currentColor: Colors.white),
+              // ignore: deprecated_member_use
+              color: Colors.white,
               width: 150,
             ),
             const SizedBox(
