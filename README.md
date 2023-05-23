@@ -88,4 +88,3 @@ dart format .
 # Authors
 
 - [Tom JUMEL](https://github.com/TomJumel)
-- [César Richard](https://github.com/cesar-richard)
