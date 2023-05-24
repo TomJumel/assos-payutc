@@ -1,21 +1,19 @@
 import 'dart:io';
 
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
-
 import 'package:payutc/compil.dart';
 import 'package:payutc/generated/l10n.dart';
 import 'package:payutc/src/services/app.dart';
 import 'package:payutc/src/ui/component/ui_utils.dart';
 import 'package:payutc/src/ui/screen/home.dart';
 import 'package:payutc/src/ui/style/color.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({Key? key}) : super(key: key);
@@ -116,6 +114,10 @@ class _SplashPageState extends State<SplashPage> {
     if (mounted) setState(() {});
     try {
       isLogged = await AppService.instance.initApp();
+    } on PlatformException {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (_) => const LoginPage()));
+      return;
     } catch (e, st) {
       Sentry.captureException(e, stackTrace: st);
       logger.e(e, e, st);
@@ -190,9 +192,8 @@ class _LoginPageState extends State<LoginPage> {
               child: SvgPicture.asset(
                 "assets/img/payutc.svg",
                 width: 30,
-                theme: SvgTheme(
-                  currentColor: isCas ? Colors.black : AppColors.orange,
-                ),
+                // ignore: deprecated_member_use
+                color: isCas ? Colors.black : AppColors.orange,
               ),
             ),
           ),
