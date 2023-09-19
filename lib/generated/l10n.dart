@@ -919,6 +919,16 @@ class Translate {
       args: [],
     );
   }
+
+  /// `Cotiser`
+  String get cotiser {
+    return Intl.message(
+      'Cotiser',
+      name: 'cotiser',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<Translate> {

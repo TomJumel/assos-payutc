@@ -1,8 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
-import 'package:sentry_dio/sentry_dio.dart';
-
 import 'package:payutc/src/env.dart' as env;
+import 'package:sentry_dio/sentry_dio.dart';
 
 class CasApi {
   late Dio client;
@@ -33,7 +32,7 @@ class CasApi {
         ),
       );
       return response.data;
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }
@@ -48,7 +47,7 @@ class CasApi {
             responseType: ResponseType.plain),
       );
       return _extractToken(response.headers.value("location"));
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         if (e.response!.statusCode == 401) {
           throw "cas/bad-credentials";

@@ -1,20 +1,21 @@
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
-import 'package:sentry_dio/sentry_dio.dart';
-
 import 'package:payutc/compil.dart';
 import 'package:payutc/src/env.dart' as env;
 import 'package:payutc/src/models/nemopay_app_properties.dart';
 import 'package:payutc/src/models/payutc_history.dart';
 import 'package:payutc/src/models/user.dart';
 import 'package:payutc/src/models/wallet.dart';
+import 'package:sentry_dio/sentry_dio.dart';
+
 import '../env.dart';
 import '../models/transfert.dart';
 
 class NemoPayApi {
   late Dio client;
   late CookieJar jar;
+  String? _sessionId;
 
   NemoPayApi() {
     client = Dio(BaseOptions(baseUrl: env.nemoPayUrl, queryParameters: {
@@ -29,6 +30,8 @@ class NemoPayApi {
     }
   }
 
+  String get sessionId => _sessionId!;
+
   /// services/MYACCOUNT/
   Future<NemoPayAppProperties> getAppProperties() async {
     final resp = await client.post("services/MYACCOUNT/loginApp",
@@ -41,6 +44,7 @@ class NemoPayApi {
     final resp = await client.post("services/MYACCOUNT/loginCas2",
         data: {"service": env.nemoPayUrl, "ticket": casTicket},
         options: Options(contentType: Headers.jsonContentType));
+    _sessionId = resp.data["sessionid"];
     return resp.data["username"];
   }
 
@@ -51,7 +55,7 @@ class NemoPayApi {
           options: Options(contentType: Headers.jsonContentType));
       logger.i(resp.data);
       return resp.data;
-    } on DioError {
+    } on DioException {
       rethrow;
     }
   }

@@ -2,13 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:payutc/generated/l10n.dart';
 import 'package:payutc/src/ui/style/color.dart';
 
 class SelectAmount extends StatefulWidget {
   final void Function(BuildContext context, double amount) onAmountSelected;
   final bool Function(double amount)? validator;
+  final int? preloadAmount;
 
   final String motif;
 
@@ -16,7 +16,8 @@ class SelectAmount extends StatefulWidget {
       {Key? key,
       required this.onAmountSelected,
       required this.motif,
-      this.validator})
+      this.validator,
+      this.preloadAmount})
       : super(key: key);
 
   @override
@@ -31,6 +32,14 @@ class _SelectAmountState extends State<SelectAmount> {
     controller.addListener(() {
       if (mounted) setState(() {});
     });
+    if (widget.preloadAmount != null) {
+      (widget.preloadAmount! / 100)
+          .toStringAsFixed(2)
+          .split("")
+          .forEach((element) {
+        _padInteract(int.parse(element == "." ? "-2" : element));
+      });
+    }
     super.initState();
   }
 

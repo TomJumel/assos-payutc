@@ -115,8 +115,10 @@ class _SplashPageState extends State<SplashPage> {
     try {
       isLogged = await AppService.instance.initApp();
     } on PlatformException {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (_) => const LoginPage()));
+      if (mounted) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (_) => const LoginPage()));
+      }
       return;
     } catch (e, st) {
       Sentry.captureException(e, stackTrace: st);
@@ -368,24 +370,30 @@ class _LoginPageState extends State<LoginPage> {
             if (!isCas) {
               AppService.instance.storageService.clear();
             }
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(Translate.of(context).badPassword)));
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(Translate.of(context).badPassword)));
+            }
             return;
         }
       }
-      if (e is DioError) {
+      if (e is DioException) {
         if (e.response?.statusCode == 400) {
-          ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(Translate.of(context).badPassword)));
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(Translate.of(context).badPassword)));
+          }
           return;
         }
       }
       logger.i("Error while connecting", e, st);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(Translate.of(context).splashError),
-        ),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(Translate.of(context).splashError),
+          ),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() {
