@@ -35,7 +35,6 @@ class GesCotizApi {
         },
       ).then((value) => value.data);
     } on DioException catch (e) {
-      print(e.response?.data);
       return e.response?.data;
     }
   }
@@ -48,7 +47,7 @@ class GesCotizApi {
           'username': username,
         },
       ).then((value) => value.statusCode == 200);
-    } on DioException catch (e) {
+    } on DioException catch (_) {
       return false;
     }
   }

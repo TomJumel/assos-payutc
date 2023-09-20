@@ -133,10 +133,10 @@ class _MemberShipScreenState extends State<MemberShipScreen> {
                 _loading = false;
                 setState(() {});
               },
-              child: Text("Cotiser (${(membershipPrice / 100).toInt()}€)"),
+              child: const Text("Cotiser (${membershipPrice ~/ 100}€)"),
             ),
             Text(
-              "Pour pouvoir cotiser, tu dois avoir ${(membershipPrice / 100).toInt()}€ sur ton compte PayUTC !",
+              "Pour pouvoir cotiser, tu dois avoir ${membershipPrice ~/ 100}€ sur ton compte PayUTC !",
               style: TextStyle(color: Colors.grey.shade800, fontSize: 12),
               textAlign: TextAlign.center,
             ),
