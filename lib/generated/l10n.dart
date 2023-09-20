@@ -1,9 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
-
 import 'package:flutter/material.dart';
-
 import 'package:intl/intl.dart';
-
 import 'intl/messages_all.dart';
 
 // **************************************************************************
@@ -918,6 +915,16 @@ class Translate {
     return Intl.message(
       'Impossible de rafraichir, une erreur est survenue',
       name: 'refreshContentError',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cotiser`
+  String get cotiser {
+    return Intl.message(
+      'Cotiser',
+      name: 'cotiser',
       desc: '',
       args: [],
     );

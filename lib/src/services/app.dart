@@ -1,12 +1,11 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
-
 import 'package:payutc/src/api/assos_utc.dart';
 import 'package:payutc/src/api/cas.dart';
+import 'package:payutc/src/api/gescotiz.dart';
 import 'package:payutc/src/api/ginger.dart';
 import 'package:payutc/src/api/nemopay.dart';
 import 'package:payutc/src/env.dart';
@@ -32,6 +31,7 @@ class AppService extends ChangeNotifier {
   late final CasApi _casApi;
   late NemoPayApi nemoPayApi;
   late WalletService walletService;
+  GesCotizApi? _gesCotizApi;
 
   AppService(
       {CasApi? casApi, NemoPayApi? nemoPayApi, StorageService? storageService})
@@ -40,6 +40,14 @@ class AppService extends ChangeNotifier {
         storageService = storageService ?? StorageService() {
     historyService = HistoryService(this);
     walletService = WalletService(this);
+  }
+
+  Future<Map?> payMembership() async {
+    return _gesCotizApi!.payMembership();
+  }
+
+  Future<bool> checkMembership() async {
+    return _gesCotizApi!.checkMembership();
   }
 
   String? userName;
@@ -69,6 +77,7 @@ class AppService extends ChangeNotifier {
     UserData? d = (await storageService.userData);
     if (await isFirstConnect || d == null) return false;
     userName = await (d.isCas ? _casConnect() : _classicConnect());
+    _gesCotizApi = GesCotizApi(nemoPayApi, userName!);
     appProperties = await nemoPayApi.getAppProperties();
     await walletService.forceLoad();
     await historyService.forceLoadHistory();
@@ -106,6 +115,9 @@ class AppService extends ChangeNotifier {
   Future<void> refreshContent() async {
     await historyService.forceLoadHistory();
     await walletService.forceLoad();
+    try {
+      _gingerUserInfos = await getUserInfos();
+    } catch (_) {}
     _updateWidget();
   }
 
@@ -137,7 +149,9 @@ class AppService extends ChangeNotifier {
 
   Future<GingerUserInfos> getUserInfos() {
     // ignore: deprecated_member_use_from_same_package
-    return Ginger.getUserInfos(userName!, gingerKey);
+    return Ginger.getUserInfos(userName!, gingerKey).then((value) {
+      return value;
+    });
   }
 
   Future<bool> changeBadgeState(bool value) => nemoPayApi.setBadgeState(value);
@@ -146,7 +160,7 @@ class AppService extends ChangeNotifier {
     String ticket = "";
     try {
       ticket = await _casApi.reConnectUser(storageService.ticket);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         if (e.response!.statusCode == 404) {
           UserData? d = await storageService.userData;

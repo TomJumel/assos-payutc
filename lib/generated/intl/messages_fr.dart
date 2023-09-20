@@ -47,6 +47,7 @@ class MessageLookup extends MessageLookupByLibrary {
         "consomation": MessageLookupByLibrary.simpleMessage("Consomation"),
         "contributor_desc": MessageLookupByLibrary.simpleMessage(
             "Être cotisant permet d\'accéder à la MDE, au Picasso et aux évenements organisés par le BDE. Cela apporte également des avantages auprès des commerçants Compiègnois."),
+        "cotiser": MessageLookupByLibrary.simpleMessage("Cotiser"),
         "cotiz": MessageLookupByLibrary.simpleMessage("Cotisation"),
         "de_lang": MessageLookupByLibrary.simpleMessage("Allemand"),
         "deleteRecentTransfert":

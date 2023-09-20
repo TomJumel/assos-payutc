@@ -1,10 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:skeletons/skeletons.dart';
-import 'package:url_launcher/url_launcher_string.dart';
-
 import 'package:payutc/generated/l10n.dart';
 import 'package:payutc/src/models/ginger_user_infos.dart';
 import 'package:payutc/src/services/app.dart';
@@ -17,8 +13,12 @@ import 'package:payutc/src/ui/screen/stats.dart';
 import 'package:payutc/src/ui/screen/transfert_select_amount.dart';
 import 'package:payutc/src/ui/style/color.dart';
 import 'package:payutc/src/ui/style/theme.dart';
+import 'package:skeletons/skeletons.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+
 import '../component/rounded_icon.dart';
 import 'account_screen.dart';
+import 'membership.dart';
 import 'receive.dart';
 import 'search_user.dart';
 
@@ -100,20 +100,26 @@ class _HomePageState extends State<HomePage>
                           leading: IconButton(
                             icon: const Icon(Icons.refresh),
                             onPressed: () async {
+                              if (historyController.loading) {
+                                return;
+                              }
                               historyController.loadHistory(forced: true);
                               try {
                                 await AppService.instance.refreshContent();
                                 if (mounted) {
+                                  setState(() {});
                                   ScaffoldMessenger.of(context)
                                       .hideCurrentMaterialBanner();
                                 }
                               } catch (_) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(Translate.of(context)
-                                        .refreshContentError),
-                                  ),
-                                );
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(Translate.of(context)
+                                          .refreshContentError),
+                                    ),
+                                  );
+                                }
                               }
                             },
                           ),
@@ -180,43 +186,49 @@ class _HomePageState extends State<HomePage>
                     physics: const BouncingScrollPhysics(),
                     scrollDirection: Axis.horizontal,
                     children: [
+                      FutureBuilder<GingerUserInfos>(
+                        future: AppService.instance.gingerUserInfos,
+                        builder: (context, snap) {
+                          if (snap.hasData &&
+                              snap.requireData.isCotisant == false) {
+                            return _buildCard(
+                              Translate.of(context).cotiser,
+                              const Icon(
+                                Icons.card_membership,
+                                size: 30,
+                                color: AppColors.orange,
+                              ),
+                              () => Navigator.push(
+                                context,
+                                CupertinoPageRoute(
+                                  builder: (c) => MemberShipScreen(
+                                    user: snap.requireData,
+                                  ),
+                                ),
+                              ).then((value) {
+                                if (value is num) {
+                                  return _reload(value.toInt());
+                                }
+                                if (value is bool) {
+                                  if (value) {
+                                    historyController.loadHistory(forced: true);
+                                    AppService.instance.refreshContent();
+                                  }
+                                  return;
+                                }
+                              }),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        },
+                      ),
                       _buildCard(
                         Translate.of(context).reload,
                         const Icon(
                           Icons.add,
                           size: 30,
                         ),
-                        () async {
-                          bool res = await PaymentFlowPage.paymentFlow(context);
-                          if (res) {
-                            historyController.loadHistory(forced: true);
-                            await AppService.instance
-                                .refreshContent()
-                                .then((value) {
-                              ScaffoldMessenger.of(context).showMaterialBanner(
-                                MaterialBanner(
-                                  leading: const Icon(
-                                    Icons.campaign,
-                                    color: AppColors.orange,
-                                  ),
-                                  content: const Text(
-                                      "L'apparition de la recharge peut prendre 1-2 minutes"),
-                                  actions: [
-                                    IconButton(
-                                      onPressed: () {
-                                        ScaffoldMessenger.of(context)
-                                            .hideCurrentMaterialBanner();
-                                      },
-                                      icon: const Icon(Icons.close),
-                                      color: AppColors.orange,
-                                    )
-                                  ],
-                                ),
-                              );
-                              if (mounted) setState(() {});
-                            });
-                          }
-                        },
+                        _reload,
                       ),
                       _buildCard(
                           Translate.of(context).send,
@@ -568,5 +580,34 @@ class _HomePageState extends State<HomePage>
         builder: (builder) => const ReceivePage(),
       ),
     );
+  }
+
+  void _reload([int? preloadAmount]) async {
+    bool res = await PaymentFlowPage.paymentFlow(context, preloadAmount);
+    if (res) {
+      historyController.loadHistory(forced: true);
+      await AppService.instance.refreshContent().then((value) {
+        ScaffoldMessenger.of(context).showMaterialBanner(
+          MaterialBanner(
+            leading: const Icon(
+              Icons.campaign,
+              color: AppColors.orange,
+            ),
+            content: const Text(
+                "L'apparition de la recharge peut prendre 1-2 minutes"),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+                },
+                icon: const Icon(Icons.close),
+                color: AppColors.orange,
+              )
+            ],
+          ),
+        );
+        if (mounted) setState(() {});
+      });
+    }
   }
 }

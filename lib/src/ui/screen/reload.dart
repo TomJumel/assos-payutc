@@ -3,15 +3,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import 'package:url_launcher/url_launcher_string.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-
 import 'package:payutc/generated/l10n.dart';
 import 'package:payutc/src/env.dart';
 import 'package:payutc/src/services/app.dart';
 import 'package:payutc/src/ui/screen/select_amount.dart';
 import 'package:payutc/src/ui/style/color.dart';
+import 'package:url_launcher/url_launcher_string.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class PaymentFlowPage extends StatefulWidget {
   final double amount;
@@ -19,7 +17,8 @@ class PaymentFlowPage extends StatefulWidget {
   const PaymentFlowPage({Key? key, required this.amount}) : super(key: key);
   static int _max = -1;
 
-  static Future<bool> paymentFlow(BuildContext context) async {
+  static Future<bool> paymentFlow(BuildContext context,
+      [int? preloadAmount]) async {
     if (_max == -1) {
       _max = await AppService.instance.nemoPayApi.getMaxAmount();
     }
@@ -27,6 +26,7 @@ class PaymentFlowPage extends StatefulWidget {
       context,
       MaterialPageRoute(
         builder: (ctx) => SelectAmount(
+          preloadAmount: preloadAmount,
           onAmountSelected: (context, amount) async {
             bool? res = await Navigator.push(
               context,
