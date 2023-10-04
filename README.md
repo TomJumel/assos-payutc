@@ -1,9 +1,12 @@
 # 💰Payutc
 
-The payutc app
-
-## Getting Started
-
+The payutc app for the SiMDE UTC
+[AppStore](https://apps.apple.com/fi/app/payutc/id1476933437)
+[PlayStore](https://play.google.com/store/apps/details?id=com.simde.payutc&hl=ln&gl=US)
+## Views
+![](https://is1-ssl.mzstatic.com/image/thumb/Purple123/v4/da/ff/9a/daff9ae7-a265-4d18-3d4c-9612e7eaf4a7/97534aa5-e72b-4685-988d-14cae33fb2e4_Frame_10_apple.png/157x0w.webp)
+![](https://is1-ssl.mzstatic.com/image/thumb/Purple113/v4/86/37/91/863791c4-613c-8c91-5a41-9f047df67f64/187c4f5f-832e-4c59-b83d-6c323562ff90_Frame_11_apple.png/157x0w.webp)
+![](https://is1-ssl.mzstatic.com/image/thumb/Purple123/v4/ee/53/e8/ee53e882-b73f-9b5c-38f5-83cc40d5d5ad/2bf935dd-87ac-406c-af25-4c906058f93c_Frame_12_apple.png/157x0w.webp)
 ### Add env file
 
 Add env.dart file in `lib/src/` with content
